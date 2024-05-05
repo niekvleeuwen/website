@@ -1,16 +1,15 @@
 ---
-title: "Analyzing Polarsteps Data of a Six Month Souteast Asia Trip"
+title: "Analyzing Polarsteps Data of a Six Month Southeast Asia Trip"
 date: 2024-04-30T10:36:07+02:00
-description: ""
+description: "Analysis of Polarsteps location data gathered during a six month trip through Southeast "
 categories: ["Data Science"]
-draft: true
 ---
 
-During my six month trip through Southeast Asia, my girlfriend and I tracked our trip using Polarsteps. This app tracks your location via a phone and shows your latest location in a dashboard, which you can share with your family and friends. Besides tracking the location, you can upload 'steps' which include some pictures and a short description about the location. Discovering the export feature sparked my curiosity and led me to analyze the data.
+During my six month trip through Southeast Asia, my girlfriend and I tracked our trip using Polarsteps. The app tracks your location and shows your latest location in a dashboard, which you can share with your family and friends. Besides tracking the location, you can upload 'steps', which include pictures/video's and a description about the location. After we returned, I wanted to create a backup, so I exported the data. Discovering that this export also contained all of the collected coordinates during our trip sparked my curiosity, and led me to analyze the data.
 
 ### Data export
 
-The [export process](https://support.polarsteps.com/article/124-how-can-i-export-a-copy-of-my-data) for Polarsteps was quite easy, and the data is provided in a JSON format. The export data contains a file with the data of the user (`user.json`) and a folder per trip. Each trip has a file with all the GPS points (`locations.json`) and a file with the information of the trip and all of the steps (`trip.json`). The uploaded media is stored in a folder per step.  
+The [export process](https://support.polarsteps.com/article/124-how-can-i-export-a-copy-of-my-data) for Polarsteps was quite easy, and the data is provided in the JSON format. The export data contains a file with the data of the user (`user.json`) and a folder per trip. Each trip has a file with all the GPS points (`locations.json`) and a file with the information of the trip and all of the steps (`trip.json`). The uploaded media is stored in a folder per step.  
 
 ```
 \---data
@@ -34,37 +33,45 @@ The [export process](https://support.polarsteps.com/article/124-how-can-i-export
             user.json
 ```
 
-### GPS pings
+### Data cleaning and exploration
 
-The location data contains only three fields: latitude, longitude and the timestamp. The first thing I noticed during the cleaning of the data: there are a lot of duplicates in the export. The original data contains 10.051 rows. After removing the duplicate rows, there were 6.457 rows left. Since our trip lasted exactly 180 days, this averages out to ~35 pings per day.
+The location data contains only three fields: latitude, longitude and the timestamp. The first thing I noticed during the cleaning of the data: there are a lot of duplicates in the export. The original data contains 10.051 rows. After removing duplicate rows, there were 6.457 rows left. Since our trip lasted exactly 180 days, this averages out to ~36 pings per day.
 
 {{< chart >}}
 type: 'line',
 data: {
   labels: ['2023-10-22','2023-10-23','2023-10-24','2023-10-25','2023-10-26','2023-10-27','2023-10-28','2023-10-29','2023-10-30','2023-10-31','2023-11-01','2023-11-02','2023-11-03','2023-11-04','2023-11-05','2023-11-06','2023-11-07','2023-11-08','2023-11-09','2023-11-10','2023-11-11','2023-11-12','2023-11-13','2023-11-14','2023-11-15','2023-11-16','2023-11-17','2023-11-18','2023-11-19','2023-11-20','2023-11-21','2023-11-22','2023-11-23','2023-11-24','2023-11-25','2023-11-26','2023-11-27','2023-11-28','2023-11-29','2023-11-30','2023-12-01','2023-12-02','2023-12-03','2023-12-04','2023-12-05','2023-12-06','2023-12-07','2023-12-08','2023-12-09','2023-12-10','2023-12-11','2023-12-12','2023-12-13','2023-12-14','2023-12-15','2023-12-16','2023-12-17','2023-12-18','2023-12-19','2023-12-20','2023-12-21','2023-12-22','2023-12-23','2023-12-24','2023-12-25','2023-12-26','2023-12-27','2023-12-28','2023-12-29','2023-12-30','2023-12-31','2024-01-01','2024-01-02','2024-01-03','2024-01-04','2024-01-05','2024-01-06','2024-01-07','2024-01-08','2024-01-09','2024-01-10','2024-01-11','2024-01-12','2024-01-13','2024-01-14','2024-01-15','2024-01-16','2024-01-17','2024-01-18','2024-01-19','2024-01-20','2024-01-21','2024-01-22','2024-01-23','2024-01-24','2024-01-25','2024-01-26','2024-01-27','2024-01-28','2024-01-29','2024-01-30','2024-01-31','2024-02-01','2024-02-02','2024-02-03','2024-02-04','2024-02-05','2024-02-06','2024-02-07','2024-02-08','2024-02-09','2024-02-10','2024-02-11','2024-02-12','2024-02-13','2024-02-14','2024-02-15','2024-02-16','2024-02-17','2024-02-18','2024-02-19','2024-02-20','2024-02-21','2024-02-22','2024-02-23','2024-02-24','2024-02-25','2024-02-26','2024-02-27','2024-02-28','2024-02-29','2024-03-01','2024-03-02','2024-03-03','2024-03-04','2024-03-05','2024-03-06','2024-03-07','2024-03-08','2024-03-09','2024-03-10','2024-03-11','2024-03-12','2024-03-13','2024-03-14','2024-03-15','2024-03-16','2024-03-17','2024-03-18','2024-03-19','2024-03-20','2024-03-21','2024-03-22','2024-03-23','2024-03-24','2024-03-25','2024-03-26','2024-03-27','2024-03-28','2024-03-29','2024-03-30','2024-03-31','2024-04-01','2024-04-02','2024-04-03','2024-04-04','2024-04-05','2024-04-06','2024-04-07','2024-04-08','2024-04-09','2024-04-10','2024-04-11','2024-04-12','2024-04-13','2024-04-14','2024-04-15','2024-04-16','2024-04-17','2024-04-18'],
   datasets: [{
-    label: 'GPS Pings by Polarsteps',
+    label: 'Location Pings by Polarsteps',
     data: [73,40,29,74,90,22,41,43,76,91,39,31,53,15,22,41,52,57,17,33,38,7,32,31,17,36,26,25,13,17,31,32,45,22,55,10,69,8,45,15,26,21,37,35,70,54,7,51,32,36,18,9,39,11,23,38,33,21,41,25,17,49,13,72,12,6,31,38,13,73,18,29,8,72,64,38,65,53,144,21,23,23,67,60,66,49,35,119,58,71,52,96,17,21,62,17,66,50,10,41,27,23,26,31,13,1,26,35,53,18,35,39,72,10,5,72,57,31,9,64,9,40,39,36,17,66,22,51,26,43,18,38,43,17,61,57,16,39,27,28,32,3,26,14,38,33,71,27,18,37,34,42,48,28,54,49,10,9,31,13,24,27,29,53,31,16,66,8,5,51,16,34,17,37,10,34,19,21,3,20],
     tension: 0.2
   }]
 }
 {{< /chart >}}
 
-Interestingly, the number of pings per day fluctuates quite a lot, with a low of just 1 and a peak of 144. The day with the most pings was one of the longest travel days, while the day with the lowest number of pings was a relaxed day on a Philippine island (without cell service, so the phone was in our hut the whole day). It seems like the number of GPS pings send to the server depends on how much the phone is moving around, which of course makes sense. This is also supported by calculating the correlation coefficient between the number of GPS pings and if we were traveling that day (yes=1, no=0), which results in a positive correlation (`0.46`).
+Interestingly, the number of pings per day fluctuated quite a lot, with a low of just 1 and a peak of 144. The day with the most pings was one of the longest travel days over land, while the day with the lowest number of pings was a relaxed day on a Philippine island (without cell service or wifi). Since Polarsteps [states](https://support.polarsteps.com/article/80-how-does-the-travel-tracker-work-does-it-use-gps#How-does-the-Travel-Tracker-work-on-iOS-BnPoN) that the tracker mostly uses WiFi and cellular signals to determine the location, this makes sense.
 
-### Distance traveled
+### Data analysis
 
-By calculating the distance to each previous point, it was possible to analyze the number of kilometers traveled.   
+Calculating the distance to each previous point made it possible to analyze the number of kilometers traveled.   
 
 {{< chart >}}
 type: 'line',
 data: {
   labels: ['2023-10-22','2023-10-23','2023-10-24','2023-10-25','2023-10-26','2023-10-27','2023-10-28','2023-10-29','2023-10-30','2023-10-31','2023-11-01','2023-11-02','2023-11-03','2023-11-04','2023-11-05','2023-11-06','2023-11-07','2023-11-08','2023-11-09','2023-11-10','2023-11-11','2023-11-12','2023-11-13','2023-11-14','2023-11-15','2023-11-16','2023-11-17','2023-11-18','2023-11-19','2023-11-20','2023-11-21','2023-11-22','2023-11-23','2023-11-24','2023-11-25','2023-11-26','2023-11-27','2023-11-28','2023-11-29','2023-11-30','2023-12-01','2023-12-02','2023-12-03','2023-12-04','2023-12-05','2023-12-06','2023-12-07','2023-12-08','2023-12-09','2023-12-10','2023-12-11','2023-12-12','2023-12-13','2023-12-14','2023-12-15','2023-12-16','2023-12-17','2023-12-18','2023-12-19','2023-12-20','2023-12-21','2023-12-22','2023-12-23','2023-12-24','2023-12-25','2023-12-26','2023-12-27','2023-12-28','2023-12-29','2023-12-30','2023-12-31','2024-01-01','2024-01-02','2024-01-03','2024-01-04','2024-01-05','2024-01-06','2024-01-07','2024-01-08','2024-01-09','2024-01-10','2024-01-11','2024-01-12','2024-01-13','2024-01-14','2024-01-15','2024-01-16','2024-01-17','2024-01-18','2024-01-19','2024-01-20','2024-01-21','2024-01-22','2024-01-23','2024-01-24','2024-01-25','2024-01-26','2024-01-27','2024-01-28','2024-01-29','2024-01-30','2024-01-31','2024-02-01','2024-02-02','2024-02-03','2024-02-04','2024-02-05','2024-02-06','2024-02-07','2024-02-08','2024-02-09','2024-02-10','2024-02-11','2024-02-12','2024-02-13','2024-02-14','2024-02-15','2024-02-16','2024-02-17','2024-02-18','2024-02-19','2024-02-20','2024-02-21','2024-02-22','2024-02-23','2024-02-24','2024-02-25','2024-02-26','2024-02-27','2024-02-28','2024-02-29','2024-03-01','2024-03-02','2024-03-03','2024-03-04','2024-03-05','2024-03-06','2024-03-07','2024-03-08','2024-03-09','2024-03-10','2024-03-11','2024-03-12','2024-03-13','2024-03-14','2024-03-15','2024-03-16','2024-03-17','2024-03-18','2024-03-19','2024-03-20','2024-03-21','2024-03-22','2024-03-23','2024-03-24','2024-03-25','2024-03-26','2024-03-27','2024-03-28','2024-03-29','2024-03-30','2024-03-31','2024-04-01','2024-04-02','2024-04-03','2024-04-04','2024-04-05','2024-04-06','2024-04-07','2024-04-08','2024-04-09','2024-04-10','2024-04-11','2024-04-12','2024-04-13','2024-04-14','2024-04-15','2024-04-16','2024-04-17','2024-04-18'],
   datasets: [{
-    label: 'Distance traveled per day',
+    label: 'Distance traveled (KM)',
     data: [10747.895528829999,1461.9733498512526,16.762451794912394,18.928990762615094,269.2993970802579,343.1809273045774,36.98158351836697,70.80714680950051,205.6239462652507,156.8346776035969,45.46110035449122,97.52135656151383,74.4002400269435,76.70414811894764,10.331241228330803,69.4276318359055,4.106649227408652,1283.4107100236258,19.084840970682947,35.8549899470424,47.77153670623346,3.712090761288526,37.514836898311174,38.607337747540875,12.282768444443155,59.60275163015416,4.96477241717054,18.85781206405386,10.112205554732494,13.286732509087297,38.19236208279275,12.540645988739392,37.83190014501344,12.479702453904284,259.66889034855427,78.36730811344879,270.8185459945203,4.512633405943021,121.66336250451421,9.42401398887085,62.393717332604076,1.845400372420643,94.46746286032483,47.6097424660344,320.6755740124581,185.1577563208771,1.173157293333927,119.93589617201562,50.84545849077375,43.62351705650337,11.803094331056771,5.274451078854902,160.0194849543034,3.674621041317423,27.022303104109696,154.75261362362167,24.073791521986163,22.144808916749525,82.3187472559763,35.05198612056458,5.4130462338689975,177.22040119053344,8.795185996518484,57.41053409654539,15.664801624493856,2.7688740527193696,53.22670995289714,138.98820852872922,8.052594046873622,241.49975645341067,28.60010844202231,1260.0269549788684,4.900863088979226,154.7105548254611,184.4551197739918,79.26049575905975,148.50440018252243,89.07304586204232,602.8751715114961,5.305190727860375,14.500157324487217,18.044017825517354,138.399892532118,204.59880935332117,175.40377553127485,346.8445369650199,8.140028136096902,383.56945635714555,81.3980905571808,84.50083990205238,76.25301149860822,282.22906630497374,1.294123317403984,14.17711388584957,296.4632666696681,4.34085093074429,187.93043587221558,162.56571162447855,6.26040312498425,1809.8754520138025,327.40297680646984,2.3120397987199035,46.466680282337286,76.42973126975595,24.692157074405987,0.0012906501934770343,66.3502668714326,46.384927002052926,136.83702826232954,20.046975469219262,124.71388384650706,602.5014195876549,139.13925968332975,4.204944442991229,1.335513063639041,136.96038331919394,87.8747174496085,25.963375923724264,3.7319562309652614,147.5331531226933,7.84723835801103,31.958283684979314,131.82857757390198,98.12072249312261,11.327250013447935,126.91416651715939,7.802568634306159,87.24435801270484,14.828295063858677,126.39103272167063,15.366166363494893,281.5085885123079,46.02084220081844,10.501707154758186,127.95021174644171,133.6334515243283,8.944083503970338,3440.801828111184,20.51387389927436,23.775224904144885,7.955009743697767,0.01112784220516215,28.665004609974897,6.593121425182266,41.607826365536184,36.76138293441446,164.66731189042784,35.78820972173749,10.990431029699513,56.47429356330707,93.12269128544379,23.69467015937455,57.541309714140404,162.9955763681446,323.8132211801247,78.46879285971625,5.059704829043846,5.714618082601092,12.2091748148914,29.185770923349526,27.88889628885878,7.715671148786002,23.817229729186813,79.99811152170987,18.116409658563676,7.801591797771444,125.49615377476377,3.542513175327469,2.826448020555566,78.39918924201088,5.6477962842663105,128.11744654582654,5.872366627186814,36.62830452388036,13.060654555204756,38.19140584394922,5.96984437198702,33.86426332191223,12204.798883512354,11.444678071594824],
     tension: 0.2
   }]
+},
+options: {
+  plugins: {
+    title: {
+      display: true,
+      text: 'Distance traveled per day',
+    }
+  }
 }
 {{< /chart >}}
 
@@ -74,7 +81,7 @@ Of course, the long haul flights to and from Southeast Asia obscure the chart. A
 |:-----------|:------------------------|:-----------------------------|----------------------:|
 | 2024-04-17 | Airplane                | Shanghai - Amsterdam         |             12204.8   |
 | 2023-10-22 | Airplane                | Amsterdam - Singapore        |             10747.9   |
-| 2024-03-07 | Airplane + Airplane     | Siargao - Kuta, Bali         |              3440.8   |
+| 2024-03-07 | Airplane + Airplane     | Siargao - Bali               |              3440.8   |
 | 2024-01-29 | Airplane + Airplane     | Hanoi - Coron                |              1809.9   |
 | 2023-10-23 | Airplane                | Singapore - Bangkok          |              1462.0   |
 | 2023-11-08 | Airplane + Bus + Ferry  | Chiang Mai - Koh Samui       |              1283.4   |
@@ -83,6 +90,8 @@ Of course, the long haul flights to and from Southeast Asia obscure the chart. A
 | 2024-02-10 | Airplane                | Puerto Princessa - Cebu City |               602.5   |
 | 2024-01-17 | Night bus               | Tam Cốc - Ha Giang           |               383.6   |
 
+
+After excluding the days with at least one flight, we get the following result.
 
 {{< chart >}}
 type: 'line',
@@ -104,7 +113,7 @@ options: {
 }
 {{< /chart >}}
 
-Another interesting statistic is the average distance traveled per day in each country. As expected, Vietnam comes out on top. We had a pretty tight schedule because we had a visa for 30 days, and wanted to see as much as possible. Also, night buses are quite common which allows for more traveling in a shorter amount of time.
+Another interesting statistic is the average distance traveled per day in each country. Vietnam comes out on top, we had a pretty tight schedule there because we had a visa for 30 days, and wanted to see as much as possible. Also, night buses are quite common in Vietnam, which allowed us to travel a greater distance in a shorter amount of time.
 
 
 {{< chart >}}
@@ -112,7 +121,7 @@ type: 'bar',
 data: {
   labels: ['Thailand', 'Malaysia', 'Singapore', 'Vietnam', 'Philippines', 'Indonesia'],
   datasets: [{
-    label: 'Distance traveled per day (KM)',
+    label: 'Average distance traveled (KM)',
     data: [103.1, 51.8, 28.6, 198.8, 82.3, 46.7],
     tension: 0.2,
   }]
@@ -121,10 +130,24 @@ options: {
   plugins: {
     title: {
       display: true,
-      text: 'Average Distance Traveled Per Day by Country (excluding travel days between countries)',
+      text: 'Average distance traveled per day by country (excluding travel days between countries)',
     }
   }
 }
 {{< /chart >}}
 
+The last insight I will share is the total distance traveled grouped by transportation method[^1]. As expected, the largest group is the airplane, which represent 72% of the total kilometers traveled.
+
+| Transportation method             |   Kilometers traveled   |
+|:----------------------------------|------------------------:|
+| Airplane (12)                     |                 33302.0 |
+| Bus (14)                          |                  2386.0 |
+| Night bus (5)                     |                  1884.8 |
+| Ferry (18)                        |                  1797.5 |
+| Taxi (5)                          |                   362.6 |
+| Scooter (2)                       |                   254.4 |
+
+
 In total, we covered a distance of 45.957 kilometers (that's 1.15 times the circumference of the earth 🌏), which is mind-blowing to me!
+
+[^1]: This table only includes days marked as a travel day and displays the total kilometers traveled that day.
