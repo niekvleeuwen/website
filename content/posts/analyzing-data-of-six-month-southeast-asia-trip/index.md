@@ -124,7 +124,7 @@ data: {
 }
 {{< /chart >}}
 
-The last insight I will share is the total distance traveled grouped by transportation method[^1]. As expected, the largest group is the airplane, which represent 72% of the total kilometers traveled.
+The last insight I will share is the total distance traveled grouped by transportation method[^1]. As expected, the largest group is the airplane, which represents 72% of the total kilometers traveled.
 
 | Transportation method             |   Kilometers traveled   |
 |:----------------------------------|------------------------:|
@@ -136,6 +136,6 @@ The last insight I will share is the total distance traveled grouped by transpor
 | Scooter (2)                       |                   254.4 |
 
 
-In total, we covered a distance of 45.957 kilometers (that's 1.15 times the circumference of the earth 🌏), which is mind-blowing to me!
+In total, we covered a distance of 45,957 kilometers (that's 1.15 times the circumference of the earth 🌏), which is mind-blowing to me!
 
 [^1]: This table only includes days marked as a travel day and displays the total kilometers traveled that day.
