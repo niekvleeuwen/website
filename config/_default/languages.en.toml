@@ -15,7 +15,7 @@ title = "Niek van Leeuwen"
 [params.author]
   name = "Niek van Leeuwen"
   image = "img/author.jpeg"
-  headline = "Restless maker 🛠️"
+  headline = "Data Scientist"
   bio = "Data Scientist"
   links = [
     { email = "mailto:ik@niekvanleeuwen.nl" },
